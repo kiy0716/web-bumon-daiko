@@ -1,0 +1,48 @@
+// Prisma schema for Web部門代行
+// データベース設計: 最小限の台帳機能のみ
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Request {
+  id String @id @default(cuid())
+
+  // 案件ID (表示用・ユーザーに見せる形式)
+  requestId String @unique
+
+  // 作成日時
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // カテゴリ
+  category String // webサイト・LP、バナー・画像、動画編集、WordPress、サーバー・ドメイン、PC・IT相談、よくわからない
+
+  // 選択内容（JSON形式で保存）
+  selectedContent String[] // 選択された内容の配列
+  selectedDetails String[] // 選択された詳細の配列
+
+  // 目安金額
+  estimateMin Int // 最小金額
+  estimateMax Int // 最大金額
+
+  // 連絡方法
+  contactMethod String // chat または zoom
+  contactTool   String? // line, chatwork, discord, email (チャットの場合のみ)
+
+  // ステータス
+  status String @default("new") // new, contacted, in_progress, waiting, done, closed
+
+  // 管理用
+  assignedTo    String? // 担当者名（任意）
+  internalNotes String? // 運営メモ（任意）
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([requestId])
+}
