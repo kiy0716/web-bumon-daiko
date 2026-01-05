@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { ContactMethod } from '@/lib/types'
 
@@ -13,6 +13,15 @@ function ContactPageContent() {
   const [selectedMethod, setSelectedMethod] = useState<ContactMethod | null>(
     null
   )
+
+  // 相談・アドバイスのみの場合は自動的にGoogle Meetに遷移
+  useEffect(() => {
+    if (isConsultationOnly) {
+      const params = new URLSearchParams(searchParams)
+      params.set('contactMethod', 'zoom')
+      router.push(`/book?${params.toString()}`)
+    }
+  }, [isConsultationOnly, searchParams, router])
 
   const handleNext = () => {
     if (!selectedMethod) return
