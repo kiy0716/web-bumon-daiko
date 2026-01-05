@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -10,7 +10,7 @@ import {
 } from '@/lib/utils'
 import { calculateEstimate } from '@/lib/constants'
 
-export default function BookPage() {
+function BookPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const category = searchParams.get('category') || ''
@@ -189,5 +189,13 @@ export default function BookPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function BookPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">読み込み中...</div>}>
+      <BookPageContent />
+    </Suspense>
   )
 }

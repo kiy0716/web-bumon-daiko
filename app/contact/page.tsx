@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { ContactMethod } from '@/lib/types'
 
-export default function ContactPage() {
+function ContactPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const category = searchParams.get('category') || ''
@@ -127,5 +127,13 @@ export default function ContactPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">読み込み中...</div>}>
+      <ContactPageContent />
+    </Suspense>
   )
 }

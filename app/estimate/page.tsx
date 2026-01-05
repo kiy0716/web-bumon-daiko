@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getCategoryDisplayName, formatPrice, getOptionLabel } from '@/lib/utils'
 import {
@@ -10,7 +11,7 @@ import {
   ADDITIONAL_DETAIL_OPTIONS,
 } from '@/lib/constants'
 
-export default function EstimatePage() {
+function EstimatePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const category = searchParams.get('category') || ''
@@ -162,5 +163,13 @@ export default function EstimatePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function EstimatePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">読み込み中...</div>}>
+      <EstimatePageContent />
+    </Suspense>
   )
 }

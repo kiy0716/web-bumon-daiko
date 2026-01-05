@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { getCategoryDisplayName, formatPrice } from '@/lib/utils'
 import { CONTENT_OPTIONS, DETAIL_OPTIONS } from '@/lib/constants'
 import type { ContactTool } from '@/lib/types'
 
-export default function DonePage() {
+function DonePageContent() {
   const searchParams = useSearchParams()
   const requestId = searchParams.get('requestId') || ''
   const contactMethod = searchParams.get('contactMethod') || ''
@@ -311,5 +311,13 @@ ${formatPrice(chatData.estimate.min)}〜${formatPrice(chatData.estimate.max)}程
         </div>
       </div>
     </div>
+  )
+}
+
+export default function DonePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">読み込み中...</div>}>
+      <DonePageContent />
+    </Suspense>
   )
 }

@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ADDITIONAL_DETAIL_OPTIONS } from '@/lib/constants'
 import { getCategoryDisplayName } from '@/lib/utils'
 
-export default function AdditionalDetailPage() {
+function AdditionalDetailPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const category = searchParams.get('category') || ''
@@ -192,5 +192,13 @@ export default function AdditionalDetailPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AdditionalDetailPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">読み込み中...</div>}>
+      <AdditionalDetailPageContent />
+    </Suspense>
   )
 }

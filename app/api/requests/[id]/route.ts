@@ -4,11 +4,12 @@ import { prisma } from '@/lib/prisma'
 // GET: 個別リクエスト取得
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const requestData = await prisma.request.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!requestData) {
@@ -31,14 +32,15 @@ export async function GET(
 // PATCH: リクエスト更新
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { status, assignedTo, internalNotes } = body
 
     const updatedRequest = await prisma.request.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(status && { status }),
         ...(assignedTo !== undefined && { assignedTo }),

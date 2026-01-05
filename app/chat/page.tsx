@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { generateRequestId } from '@/lib/utils'
 import { calculateEstimate } from '@/lib/constants'
 import type { ContactTool } from '@/lib/types'
 
-export default function ChatPage() {
+function ChatPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const category = searchParams.get('category') || ''
@@ -169,5 +169,13 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">読み込み中...</div>}>
+      <ChatPageContent />
+    </Suspense>
   )
 }
