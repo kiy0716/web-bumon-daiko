@@ -9,6 +9,8 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log('受信したリクエストボディ:', JSON.stringify(body, null, 2))
+
     const {
       requestId,
       category,
@@ -26,16 +28,26 @@ export async function POST(request: NextRequest) {
       !category ||
       !selectedContent ||
       !selectedDetails ||
-      !estimateMin ||
-      !estimateMax ||
+      estimateMin === undefined ||
+      estimateMax === undefined ||
       !contactMethod
     ) {
+      console.error('バリデーションエラー:', {
+        requestId: !!requestId,
+        category: !!category,
+        selectedContent: !!selectedContent,
+        selectedDetails: !!selectedDetails,
+        estimateMin: estimateMin !== undefined,
+        estimateMax: estimateMax !== undefined,
+        contactMethod: !!contactMethod,
+      })
       return NextResponse.json(
         { error: '必須項目が不足しています' },
         { status: 400 }
       )
     }
 
+    console.log('データベース保存開始...')
     // データベースに保存
     const createdRequest = await prisma.request.create({
       data: {
@@ -50,6 +62,7 @@ export async function POST(request: NextRequest) {
         status: 'new',
       },
     })
+    console.log('データベース保存成功:', createdRequest.id)
 
     // メール送信データ
     const emailData = {
@@ -92,8 +105,16 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     console.error('リクエスト作成エラー:', error)
+    console.error('エラー詳細:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    })
     return NextResponse.json(
-      { error: '内部サーバーエラー' },
+      {
+        error: '内部サーバーエラー',
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     )
   }
