@@ -1,7 +1,6 @@
 import { Resend } from 'resend'
 
-if (!process.env.RESEND_API_KEY) {
-  throw new Error('RESEND_API_KEY is not defined')
-}
-
-export const resend = new Resend(process.env.RESEND_API_KEY)
+// Resendの初期化（環境変数がない場合はnull）
+export const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null

@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     // ここでは省略し、管理者への通知のみ実装
 
     // 管理者への通知メール送信
-    if (process.env.ADMIN_EMAIL && process.env.FROM_EMAIL) {
+    if (resend && process.env.ADMIN_EMAIL && process.env.FROM_EMAIL && process.env.MAIL_ENABLED === 'true') {
       try {
         const adminEmail = generateAdminNotificationEmail(emailData)
         await resend.emails.send({
@@ -82,6 +82,8 @@ export async function POST(request: NextRequest) {
         console.error('メール送信エラー:', emailError)
         // メール送信失敗してもリクエスト自体は成功とする
       }
+    } else {
+      console.log('メール送信スキップ: Resend未設定またはMAIL_ENABLED=false')
     }
 
     return NextResponse.json(
