@@ -12,6 +12,7 @@ export default function ContentPage() {
 
   const [selectedContent, setSelectedContent] = useState<string[]>([])
   const contentOptions = CONTENT_OPTIONS[category] || []
+  const isConsultationOnly = category === 'consultation-only' || category === 'general-consultation' || selectedContent.includes('consultation-advice')
 
   const toggleContent = (contentId: string) => {
     setSelectedContent((prev) =>
@@ -25,7 +26,14 @@ export default function ContentPage() {
     if (selectedContent.length === 0) return
     const params = new URLSearchParams(searchParams)
     params.set('selectedContent', selectedContent.join(','))
-    router.push(`/flow/detail?${params.toString()}`)
+
+    // 相談・アドバイスのみの場合はSTEP 3をスキップして直接見積もりへ
+    // ただし、顧問契約カテゴリの場合は詳細選択ページへ進む
+    if ((category === 'consultation-only' || category === 'general-consultation' || selectedContent.includes('consultation-advice')) && category !== 'advisory') {
+      router.push(`/estimate?${params.toString()}`)
+    } else {
+      router.push(`/flow/detail?${params.toString()}`)
+    }
   }
 
   if (!category) {
@@ -37,13 +45,15 @@ export default function ContentPage() {
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <div className="text-sm text-gray-500 mb-2">STEP 2 / 5</div>
-          <div className="text-sm text-primary mb-2">
-            選択カテゴリ: {getCategoryDisplayName(category)}
+          <div className="text-sm text-gray-500 mb-2">
+            {category === 'consultation-only' ? '2️⃣ STEP 2 / 4' : '2️⃣ STEP 2 / 6'}
           </div>
-          <h1 className="text-3xl font-bold">どんなことで困っていますか？</h1>
+          <div className="text-sm text-primary mb-2">
+            📂 選択カテゴリ: {getCategoryDisplayName(category)}
+          </div>
+          <h1 className="text-3xl font-bold">🤔 どんなことで困っていますか？</h1>
           <p className="text-gray-600 mt-2">
-            該当するものを選んでください（複数選択可）
+            該当するものを選んでください（複数選択可） ✅
           </p>
         </div>
 

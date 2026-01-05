@@ -15,13 +15,15 @@ export function generateRequestId(): string {
  */
 export function getCategoryDisplayName(category: string): string {
   const categoryMap: { [key: string]: string } = {
+    'general-consultation': 'まずは色々相談したい',
     'website-lp': 'Webサイト・LP',
     'banner-image': 'バナー・画像',
     'video': '動画編集',
     'wordpress': 'WordPress',
     'server-domain': 'サーバー・ドメイン',
     'pc-it': 'PC・IT相談',
-    'unknown': 'よくわからない',
+    'consultation-only': '制作ではなく相談・アドバイスが欲しい',
+    'advisory': '顧問契約を頼みたい',
   }
   return categoryMap[category] || category
 }
@@ -85,4 +87,29 @@ export function formatDate(date: Date | string): string {
     hour: '2-digit',
     minute: '2-digit',
   }).format(d)
+}
+
+/**
+ * 選択肢IDからラベルを取得
+ */
+export function getOptionLabel(
+  optionId: string,
+  category: string,
+  optionsMap: any
+): string {
+  // カテゴリに紐づく選択肢から検索
+  if (optionsMap[category]) {
+    const option = optionsMap[category].find((opt: any) => opt.id === optionId)
+    if (option) return option.label
+  }
+
+  // category-content の組み合わせで検索（DETAIL_OPTIONS用）
+  for (const key in optionsMap) {
+    if (key.startsWith(category)) {
+      const option = optionsMap[key].find((opt: any) => opt.id === optionId)
+      if (option) return option.label
+    }
+  }
+
+  return optionId
 }

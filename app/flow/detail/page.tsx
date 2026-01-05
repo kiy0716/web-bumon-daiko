@@ -13,6 +13,19 @@ export default function DetailPage() {
 
   const [selectedDetails, setSelectedDetails] = useState<string[]>([])
 
+  // category と selectedContent の組み合わせで特化した質問を取得
+  const getDetailOptions = () => {
+    // まず category-content の組み合わせを試す
+    const combinedKey = `${category}-${selectedContent[0]}`
+    if (DETAIL_OPTIONS[combinedKey]) {
+      return DETAIL_OPTIONS[combinedKey]
+    }
+    // なければ category のみで取得
+    return DETAIL_OPTIONS[category] || []
+  }
+
+  const detailOptions = getDetailOptions()
+
   const toggleDetail = (detailId: string) => {
     setSelectedDetails((prev) =>
       prev.includes(detailId)
@@ -25,7 +38,35 @@ export default function DetailPage() {
     if (selectedDetails.length === 0) return
     const params = new URLSearchParams(searchParams)
     params.set('selectedDetails', selectedDetails.join(','))
-    router.push(`/estimate?${params.toString()}`)
+
+    // LP新規制作・Webサイト新規制作・リニューアル・修正・表示崩れ・表示遅い・バナー画像・WordPressの場合は追加質問ページへ（相談のみは除く）
+    const combinedKey = `${category}-${selectedContent[0]}`
+    const hasAdditionalDetail = [
+      'website-lp-new-lp',
+      'website-lp-new-website',
+      'website-lp-renewal-lp',
+      'website-lp-renewal-website',
+      'website-lp-modify',
+      'website-lp-broken',
+      'website-lp-slow',
+      'banner-image-new-banner',
+      'banner-image-thumbnail',
+      'banner-image-edit-image',
+      'banner-image-resize',
+      'wordpress-text-image-fix',
+      'wordpress-plugin-issue',
+      'wordpress-error-fix',
+      'wordpress-display-broken',
+      'wordpress-security',
+      'wordpress-backup-restore',
+      'wordpress-add-function'
+    ].includes(combinedKey)
+
+    if (hasAdditionalDetail && !selectedDetails.includes('consultation-advice')) {
+      router.push(`/flow/additional-detail?${params.toString()}`)
+    } else {
+      router.push(`/estimate?${params.toString()}`)
+    }
   }
 
   if (!category) {
@@ -37,16 +78,16 @@ export default function DetailPage() {
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <div className="text-sm text-gray-500 mb-2">STEP 3 / 5</div>
+          <div className="text-sm text-gray-500 mb-2">3️⃣ STEP 3 / 6</div>
           <div className="text-sm text-primary mb-2">
-            選択カテゴリ: {getCategoryDisplayName(category)}
+            📂 選択カテゴリ: {getCategoryDisplayName(category)}
           </div>
-          <h1 className="text-3xl font-bold">該当するものを選んでください</h1>
-          <p className="text-gray-600 mt-2">複数選択可</p>
+          <h1 className="text-3xl font-bold">📝 該当するものを選んでください</h1>
+          <p className="text-gray-600 mt-2">複数選択可 ✅</p>
         </div>
 
         <div className="space-y-3">
-          {DETAIL_OPTIONS.map((option) => (
+          {detailOptions.map((option) => (
             <button
               key={option.id}
               onClick={() => toggleDetail(option.id)}

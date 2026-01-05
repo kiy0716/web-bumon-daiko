@@ -2,11 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  getCategoryDisplayName,
-  formatPrice,
-  generateRequestId,
-} from '@/lib/utils'
+import Link from 'next/link'
+import { generateRequestId } from '@/lib/utils'
 import { calculateEstimate } from '@/lib/constants'
 import type { ContactTool } from '@/lib/types'
 
@@ -19,8 +16,8 @@ export default function ChatPage() {
 
   const [requestId, setRequestId] = useState('')
   const [selectedTool, setSelectedTool] = useState<ContactTool | null>(null)
-  const [copied, setCopied] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   const estimate = calculateEstimate(category, selectedContent, selectedDetails)
 
@@ -28,32 +25,8 @@ export default function ChatPage() {
     setRequestId(generateRequestId())
   }, [])
 
-  const copyText = `【Web部門代行 相談】
-案件ID：${requestId}
-
-■カテゴリ
-${getCategoryDisplayName(category)}
-
-■内容
-${selectedContent.join(', ')}
-
-■詳細
-${selectedDetails.join(', ')}
-
-■目安金額
-${formatPrice(estimate.min)}〜${formatPrice(estimate.max)}程度
-
-■補足（任意）
-`
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(copyText)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   const handleSubmit = async () => {
-    if (!selectedTool) return
+    if (!selectedTool || !termsAccepted) return
 
     setSubmitting(true)
     try {
@@ -73,6 +46,18 @@ ${formatPrice(estimate.min)}〜${formatPrice(estimate.max)}程度
       })
 
       if (response.ok) {
+        // セッションストレージに情報を保存
+        sessionStorage.setItem(
+          'chatRequestData',
+          JSON.stringify({
+            requestId,
+            category,
+            selectedContent,
+            selectedDetails,
+            contactTool: selectedTool,
+            estimate,
+          })
+        )
         router.push(`/done?requestId=${requestId}&contactMethod=chat`)
       } else {
         alert('エラーが発生しました。もう一度お試しください。')
@@ -94,41 +79,17 @@ ${formatPrice(estimate.min)}〜${formatPrice(estimate.max)}程度
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">
-            チャットで相談を開始します
+            💬 チャットで相談を開始します
           </h1>
           <p className="text-gray-600">
-            下の内容をコピーして、選んだチャットに貼り付けて送ってください
+            どのチャットツールで相談しますか？選択して「次へ」ボタンを押してください 📋
           </p>
-        </div>
-
-        {/* 案件ID */}
-        <div className="card bg-primary text-white text-center mb-6">
-          <div className="text-sm mb-1">案件ID</div>
-          <div className="text-2xl font-bold">{requestId}</div>
-        </div>
-
-        {/* コピー用テキスト */}
-        <div className="card mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold">コピーする内容</h2>
-            <button
-              onClick={handleCopy}
-              className="btn-primary py-2 px-4 text-sm"
-            >
-              {copied ? 'コピーしました！' : 'コピー'}
-            </button>
-          </div>
-          <div className="bg-gray-50 p-4 rounded border border-gray-200">
-            <pre className="text-sm whitespace-pre-wrap font-mono">
-              {copyText}
-            </pre>
-          </div>
         </div>
 
         {/* チャットツール選択 */}
         <div className="card mb-6">
           <h2 className="font-bold mb-4">
-            どのツールで送りますか？（選択してください）
+            📱 どのツールで相談しますか？（選択してください）
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -165,10 +126,32 @@ ${formatPrice(estimate.min)}〜${formatPrice(estimate.max)}程度
 
           <div className="mt-6 space-y-2 text-sm text-gray-600">
             <p>
-              • コピーした内容を、選んだツールに貼り付けて送信してください
+              • 次のページで、コピー用の相談内容が表示されます
             </p>
-            <p>• 送信後、下の「完了」ボタンを押してください</p>
+            <p>• そちらを選んだツールに送信してください</p>
           </div>
+        </div>
+
+        {/* 利用規約への同意 */}
+        <div className="card mb-6">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+            />
+            <span className="text-sm text-gray-700">
+              <Link
+                href="/terms"
+                target="_blank"
+                className="text-primary hover:underline font-medium"
+              >
+                📋 利用規約・免責事項
+              </Link>
+              に同意します
+            </span>
+          </label>
         </div>
 
         {/* アクション */}
@@ -178,10 +161,10 @@ ${formatPrice(estimate.min)}〜${formatPrice(estimate.max)}程度
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!selectedTool || submitting}
+            disabled={!selectedTool || !termsAccepted || submitting}
             className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? '送信中...' : '完了'}
+            {submitting ? '処理中...' : '次へ（相談内容の送信） →'}
           </button>
         </div>
       </div>

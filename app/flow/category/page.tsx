@@ -20,24 +20,54 @@ export default function CategoryPage() {
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <div className="text-sm text-gray-500 mb-2">STEP 1 / 5</div>
-          <h1 className="text-3xl font-bold">何について相談・依頼しますか？</h1>
+          <div className="text-sm text-gray-500 mb-2">1️⃣ STEP 1 / 6</div>
+          <h1 className="text-3xl font-bold">📋 何について相談・依頼しますか？</h1>
         </div>
 
+        {/* まずは色々相談したい - 一列で表示 */}
+        {CATEGORIES.filter(cat => cat.id === 'general-consultation').map((category) => (
+          <button
+            key={category.id}
+            onClick={() => setSelectedCategory(category.id)}
+            className={`card text-center transition-all mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 ${
+              selectedCategory === category.id
+                ? 'ring-2 ring-primary bg-blue-100'
+                : 'hover:bg-blue-50'
+            }`}
+          >
+            <h3 className="font-bold text-2xl mb-2">{category.label}</h3>
+            <p className="text-sm text-gray-600">{category.description}</p>
+          </button>
+        ))}
+
+        {/* その他のカテゴリ - 2列で表示 */}
         <div className="grid md:grid-cols-2 gap-4">
-          {CATEGORIES.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
-              className={`card text-left transition-all ${
-                selectedCategory === category.id
-                  ? 'ring-2 ring-primary bg-blue-50'
-                  : 'hover:bg-gray-50'
-              }`}
-            >
-              <h3 className="font-bold text-lg mb-2">{category.label}</h3>
-              <p className="text-sm text-gray-600">{category.description}</p>
-            </button>
+          {CATEGORIES.filter(cat => cat.id !== 'general-consultation').map((category) => (
+            category.comingSoon ? (
+              <div
+                key={category.id}
+                className="card text-left bg-gray-100 opacity-60 cursor-not-allowed relative"
+              >
+                <div className="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded">
+                  準備中
+                </div>
+                <h3 className="font-bold text-lg mb-2 text-gray-500">{category.label}</h3>
+                <p className="text-sm text-gray-500">{category.description}</p>
+              </div>
+            ) : (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`card text-left transition-all ${
+                  selectedCategory === category.id
+                    ? 'ring-2 ring-primary bg-blue-50'
+                    : 'hover:bg-gray-50'
+                }`}
+              >
+                <h3 className="font-bold text-lg mb-2">{category.label}</h3>
+                <p className="text-sm text-gray-600">{category.description}</p>
+              </button>
+            )
           ))}
         </div>
 

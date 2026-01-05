@@ -7,6 +7,9 @@ import type { ContactMethod } from '@/lib/types'
 export default function ContactPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const category = searchParams.get('category') || ''
+  const selectedContent = searchParams.get('selectedContent')?.split(',') || []
+  const isConsultationOnly = category === 'consultation-only' || category === 'general-consultation' || selectedContent.includes('consultation-advice')
   const [selectedMethod, setSelectedMethod] = useState<ContactMethod | null>(
     null
   )
@@ -27,8 +30,10 @@ export default function ContactPage() {
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <div className="text-sm text-gray-500 mb-2">STEP 5 / 5</div>
-          <h1 className="text-3xl font-bold">どの方法で進めますか？</h1>
+          <div className="text-sm text-gray-500 mb-2">
+            {isConsultationOnly ? '4️⃣ STEP 4 / 4' : '6️⃣ STEP 6 / 6'}
+          </div>
+          <h1 className="text-3xl font-bold">📞 どの方法で進めますか？</h1>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -57,19 +62,19 @@ export default function ContactPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl font-bold">チャットで相談する</h2>
+              <h2 className="text-xl font-bold">💬 チャットで相談する</h2>
             </div>
             <div className="space-y-2 text-sm text-gray-600">
-              <p>• 今すぐ聞きたい</p>
-              <p>• 文章でやり取りしたい</p>
-              <p>• 軽い相談・判断</p>
+              <p>✅ 今すぐ聞きたい</p>
+              <p>✅ 文章でやり取りしたい</p>
+              <p>✅ 軽い相談・判断</p>
             </div>
             <div className="mt-4 text-xs text-gray-500">
               → 次画面で「コピペして送る」案内を出します
             </div>
           </button>
 
-          {/* Zoom相談 */}
+          {/* Google Meet相談 */}
           <button
             onClick={() => setSelectedMethod('zoom')}
             className={`card text-left transition-all ${
@@ -94,12 +99,13 @@ export default function ContactPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl font-bold">Zoomで相談する</h2>
+              <h2 className="text-xl font-bold">🎥 オンライン会議で相談する</h2>
             </div>
             <div className="space-y-2 text-sm text-gray-600">
-              <p>• 話した方が早い</p>
-              <p>• 内容を整理したい</p>
-              <p>• 作業を確定したい</p>
+              <p>✅ 話した方が早い</p>
+              <p>✅ 内容を整理したい</p>
+              <p>✅ 作業を確定したい</p>
+              <p className="text-xs text-gray-500 mt-2">※ Google Meetを使用します</p>
             </div>
             <div className="mt-4 text-xs text-gray-500">
               → 次画面で日時選択へ

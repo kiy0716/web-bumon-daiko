@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // データベースに保存
-    const request = await prisma.request.create({
+    const createdRequest = await prisma.request.create({
       data: {
         requestId,
         category,
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: true, requestId: request.requestId },
+      { success: true, requestId: createdRequest.requestId },
       { status: 201 }
     )
   } catch (error) {

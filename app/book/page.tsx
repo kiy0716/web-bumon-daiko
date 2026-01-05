@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import {
   getCategoryDisplayName,
   formatPrice,
@@ -18,6 +19,7 @@ export default function BookPage() {
 
   const [requestId, setRequestId] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   const estimate = calculateEstimate(category, selectedContent, selectedDetails)
   const googleCalendarUrl =
@@ -28,6 +30,8 @@ export default function BookPage() {
   }, [])
 
   const handleSubmit = async () => {
+    if (!termsAccepted) return
+
     setSubmitting(true)
     try {
       const response = await fetch('/api/requests', {
@@ -46,6 +50,18 @@ export default function BookPage() {
       })
 
       if (response.ok) {
+        // セッションストレージに情報を保存
+        sessionStorage.setItem(
+          'bookingRequestData',
+          JSON.stringify({
+            requestId,
+            category,
+            selectedContent,
+            selectedDetails,
+            estimate,
+            googleCalendarUrl,
+          })
+        )
         router.push(`/done?requestId=${requestId}&contactMethod=zoom`)
       } else {
         alert('エラーが発生しました。もう一度お試しください。')
@@ -66,24 +82,18 @@ export default function BookPage() {
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-4">Zoom相談の予約</h1>
+          <h1 className="text-3xl font-bold mb-4">🎥 オンライン会議相談の予約</h1>
           <p className="text-gray-600">
-            空いている時間から選ぶだけで予約できます
+            次のページで、空いている時間から選んで予約できます 📅
           </p>
-        </div>
-
-        {/* 案件ID */}
-        <div className="card bg-primary text-white text-center mb-6">
-          <div className="text-sm mb-1">案件ID</div>
-          <div className="text-2xl font-bold">{requestId}</div>
-          <div className="text-xs mt-2 opacity-90">
-            予約時にこのIDをメモしておいてください
-          </div>
+          <p className="text-sm text-gray-500 mt-2">
+            ※ Google Meet（オンライン会議ツール）を使用します
+          </p>
         </div>
 
         {/* 選択内容の確認 */}
         <div className="card mb-6">
-          <h2 className="font-bold text-lg mb-4">選択内容の確認</h2>
+          <h2 className="font-bold text-lg mb-4">✅ 選択内容の確認</h2>
           <div className="space-y-3 text-sm">
             <div>
               <span className="font-medium text-gray-700">カテゴリ:</span>
@@ -106,63 +116,62 @@ export default function BookPage() {
           </div>
         </div>
 
-        {/* 予約手順 */}
-        <div className="card mb-6">
-          <h2 className="font-bold text-lg mb-4">予約の手順</h2>
-          <ol className="space-y-3 text-sm">
-            <li className="flex items-start">
-              <span className="inline-flex items-center justify-center w-6 h-6 bg-primary text-white rounded-full mr-3 flex-shrink-0 text-xs">
-                1
-              </span>
-              <span>下のボタンから予約ページへ移動します</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-flex items-center justify-center w-6 h-6 bg-primary text-white rounded-full mr-3 flex-shrink-0 text-xs">
-                2
-              </span>
-              <span>空いている日時を選んで予約します</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-flex items-center justify-center w-6 h-6 bg-primary text-white rounded-full mr-3 flex-shrink-0 text-xs">
-                3
-              </span>
-              <span>
-                予約後、このページに戻って「完了」ボタンを押してください
-              </span>
-            </li>
-          </ol>
-        </div>
-
-        {/* 予約ボタン */}
-        <div className="card bg-blue-50 border-2 border-primary mb-6">
-          <div className="text-center">
-            <p className="text-sm text-gray-600 mb-4">
-              予約ページへ移動します（新しいタブで開きます）
-            </p>
-            <a
-              href={googleCalendarUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary text-lg"
-            >
-              Zoom相談を予約する
-            </a>
-          </div>
-        </div>
-
-        {/* 注意事項 */}
-        <div className="card bg-yellow-50 border border-yellow-200 mb-6">
+        {/* 予約の流れ */}
+        <div className="card bg-blue-50 border border-blue-200 mb-6">
           <div className="text-sm space-y-2">
-            <p className="font-bold text-yellow-800">
-              予約後、必要に応じてこちらから連絡します
+            <p className="font-bold text-blue-800">
+              📋 この後の流れ
             </p>
-            <p className="text-gray-600">
+            <p className="text-gray-700">
+              • 次のページで予約カレンダーへのリンクが表示されます
+            </p>
+            <p className="text-gray-700">
+              • 空いている日時を選んで予約してください
+            </p>
+            <p className="text-gray-700">
               • 予約確認のメールが届きます
             </p>
+          </div>
+        </div>
+
+        {/* キャンセルポリシー */}
+        <div className="card bg-red-50 border border-red-200 mb-6">
+          <div className="text-sm space-y-2">
+            <p className="font-bold text-red-800">
+              ⚠️ キャンセルポリシー
+            </p>
+            <p className="text-gray-700">
+              • <strong>当日キャンセルの場合、キャンセル料金として¥3,000が発生します</strong>
+            </p>
             <p className="text-gray-600">
-              • 案件ID「{requestId}」を控えておいてください
+              • 前日までのキャンセルは無料です
+            </p>
+            <p className="text-gray-600">
+              • キャンセルや日時変更は、予約確認メールから行えます
             </p>
           </div>
+        </div>
+
+        {/* 利用規約への同意 */}
+        <div className="card mb-6">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+            />
+            <span className="text-sm text-gray-700">
+              <Link
+                href="/terms"
+                target="_blank"
+                className="text-primary hover:underline font-medium"
+              >
+                📋 利用規約・免責事項
+              </Link>
+              に同意します
+            </span>
+          </label>
         </div>
 
         {/* アクション */}
@@ -172,10 +181,10 @@ export default function BookPage() {
           </button>
           <button
             onClick={handleSubmit}
-            disabled={submitting}
+            disabled={!termsAccepted || submitting}
             className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? '送信中...' : '予約完了'}
+            {submitting ? '処理中...' : '次へ（予約ページへ） →'}
           </button>
         </div>
       </div>
