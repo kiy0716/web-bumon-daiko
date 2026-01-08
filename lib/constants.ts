@@ -9,6 +9,11 @@ export const CATEGORIES: CategoryOption[] = [
     description: 'オンライン会議で気軽に相談（40分 / ¥4,000+税）',
   },
   {
+    id: 'youtube-consultation',
+    label: '🎥 YouTubeの内容について詳しく知りたい',
+    description: 'チャンネルで紹介した内容の質問・相談（40分 / ¥4,000+税）',
+  },
+  {
     id: 'website-lp',
     label: '🌐 Webサイト・LP',
     description: '新規制作・修正・改善など',
@@ -55,6 +60,7 @@ export const CATEGORIES: CategoryOption[] = [
 // カテゴリ別の内容選択肢
 export const CONTENT_OPTIONS: Record<string, ContentOption[]> = {
   'general-consultation': [{ id: 'zoom-consultation', label: 'オンライン会議で相談したい（40分 / ¥4,000+税）' }],
+  'youtube-consultation': [{ id: 'zoom-consultation', label: 'オンライン会議で相談したい（40分 / ¥4,000+税）' }],
   'website-lp': [
     { id: 'new-lp', label: 'LPを新しく作りたい' },
     { id: 'new-website', label: 'Webサイトを新しく作りたい' },
@@ -502,12 +508,13 @@ export function calculateEstimate(
   if (
     category === 'consultation-only' ||
     category === 'general-consultation' ||
+    category === 'youtube-consultation' ||
     selectedContent.includes('consultation-advice') ||
     selectedContent.includes('consultation') ||
     selectedDetails.includes('consultation')
   ) {
-    // consultation-only, general-consultation または consultation-advice の場合は 40分 / ¥4,000+税
-    if (category === 'consultation-only' || category === 'general-consultation' || selectedContent.includes('consultation-advice')) {
+    // consultation-only, general-consultation, youtube-consultation または consultation-advice の場合は 40分 / ¥4,000+税
+    if (category === 'consultation-only' || category === 'general-consultation' || category === 'youtube-consultation' || selectedContent.includes('consultation-advice')) {
       return { min: 4400, max: 4400 } // 税込
     }
     return { min: 3000, max: 5000 }
@@ -523,6 +530,7 @@ export function calculateEstimate(
     'pc-it': { min: 3000, max: 20000 },
     'consultation-only': { min: 4400, max: 4400 },
     'general-consultation': { min: 4400, max: 4400 },
+    'youtube-consultation': { min: 4400, max: 4400 },
     advisory: { min: 30000, max: 100000 },
   }
 

@@ -24,25 +24,9 @@ export default function CategoryPage() {
           <h1 className="text-3xl font-bold">📋 何について相談・依頼しますか？</h1>
         </div>
 
-        {/* まずは色々相談したい - 一列で表示 */}
-        {CATEGORIES.filter(cat => cat.id === 'general-consultation').map((category) => (
-          <button
-            key={category.id}
-            onClick={() => setSelectedCategory(category.id)}
-            className={`card text-center transition-all mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 ${
-              selectedCategory === category.id
-                ? 'ring-2 ring-primary bg-blue-100'
-                : 'hover:bg-blue-50'
-            }`}
-          >
-            <h3 className="font-bold text-2xl mb-2">{category.label}</h3>
-            <p className="text-sm text-gray-600">{category.description}</p>
-          </button>
-        ))}
-
-        {/* その他のカテゴリ - 2列で表示 */}
+        {/* すべてのカテゴリ - 2列で表示 */}
         <div className="grid md:grid-cols-2 gap-4">
-          {CATEGORIES.filter(cat => cat.id !== 'general-consultation').map((category) => (
+          {CATEGORIES.map((category) => (
             category.comingSoon ? (
               <div
                 key={category.id}

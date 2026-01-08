@@ -12,14 +12,11 @@ function ContentPageContent() {
 
   const [selectedContent, setSelectedContent] = useState<string[]>([])
   const contentOptions = CONTENT_OPTIONS[category] || []
-  const isConsultationOnly = category === 'consultation-only' || category === 'general-consultation' || selectedContent.includes('consultation-advice')
+  const isConsultationOnly = category === 'consultation-only' || category === 'general-consultation' || category === 'youtube-consultation' || selectedContent.includes('consultation-advice')
 
-  const toggleContent = (contentId: string) => {
-    setSelectedContent((prev) =>
-      prev.includes(contentId)
-        ? prev.filter((id) => id !== contentId)
-        : [...prev, contentId]
-    )
+  const selectContent = (contentId: string) => {
+    // 単一選択：選択した項目のみを配列に設定
+    setSelectedContent([contentId])
   }
 
   const handleNext = () => {
@@ -29,7 +26,7 @@ function ContentPageContent() {
 
     // 相談・アドバイスのみの場合はSTEP 3をスキップして直接見積もりへ
     // ただし、顧問契約カテゴリの場合は詳細選択ページへ進む
-    if ((category === 'consultation-only' || category === 'general-consultation' || selectedContent.includes('consultation-advice')) && category !== 'advisory') {
+    if ((category === 'consultation-only' || category === 'general-consultation' || category === 'youtube-consultation' || selectedContent.includes('consultation-advice')) && category !== 'advisory') {
       router.push(`/estimate?${params.toString()}`)
     } else {
       router.push(`/flow/detail?${params.toString()}`)
@@ -53,7 +50,7 @@ function ContentPageContent() {
           </div>
           <h1 className="text-3xl font-bold">🤔 どんなことで困っていますか？</h1>
           <p className="text-gray-600 mt-2">
-            該当するものを選んでください（複数選択可） ✅
+            該当するものを選んでください
           </p>
         </div>
 
@@ -61,7 +58,7 @@ function ContentPageContent() {
           {contentOptions.map((option) => (
             <button
               key={option.id}
-              onClick={() => toggleContent(option.id)}
+              onClick={() => selectContent(option.id)}
               className={`card w-full text-left transition-all ${
                 selectedContent.includes(option.id)
                   ? 'ring-2 ring-primary bg-blue-50'
@@ -70,24 +67,14 @@ function ContentPageContent() {
             >
               <div className="flex items-center">
                 <div
-                  className={`w-5 h-5 border-2 rounded mr-3 flex items-center justify-center ${
+                  className={`w-5 h-5 border-2 rounded-full mr-3 flex items-center justify-center ${
                     selectedContent.includes(option.id)
-                      ? 'bg-primary border-primary'
+                      ? 'border-primary'
                       : 'border-gray-300'
                   }`}
                 >
                   {selectedContent.includes(option.id) && (
-                    <svg
-                      className="w-3 h-3 text-white"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path d="M5 13l4 4L19 7"></path>
-                    </svg>
+                    <div className="w-3 h-3 bg-primary rounded-full"></div>
                   )}
                 </div>
                 <span className="font-medium">{option.label}</span>

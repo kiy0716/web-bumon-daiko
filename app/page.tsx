@@ -8,7 +8,7 @@ export default function HomePage() {
       <section className="bg-gradient-to-b from-blue-50 to-white py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            💼 Web部門代行
+            💼 Web部門プラス
           </h1>
           <p className="text-2xl text-gray-700 mb-4">
             Web担当者がいない会社のための、Webの総合窓口 🌐
@@ -32,14 +32,14 @@ export default function HomePage() {
           {/* まずはざっくり相談したい方へ */}
           <div className="mb-12">
             <p className="text-gray-700 font-medium mb-3">まずはざっくり相談したい方へ</p>
-            <div className="max-w-3xl mx-auto">
-              {CATEGORIES.filter(cat => cat.id === 'general-consultation').map((category) => (
+            <div className="grid md:grid-cols-2 gap-4">
+              {CATEGORIES.filter(cat => cat.id === 'general-consultation' || cat.id === 'youtube-consultation').map((category) => (
                 <Link
                   key={category.id}
                   href={`/flow/content?category=${category.id}`}
-                  className="block card text-center hover:bg-blue-50 hover:ring-2 hover:ring-primary transition-all bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200"
+                  className="card text-left hover:bg-blue-50 hover:ring-2 hover:ring-primary transition-all"
                 >
-                  <h3 className="font-bold text-2xl mb-2">{category.label}</h3>
+                  <h3 className="font-bold text-lg mb-2">{category.label}</h3>
                   <p className="text-sm text-gray-600">{category.description}</p>
                 </Link>
               ))}

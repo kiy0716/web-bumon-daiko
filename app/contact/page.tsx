@@ -9,19 +9,13 @@ function ContactPageContent() {
   const searchParams = useSearchParams()
   const category = searchParams.get('category') || ''
   const selectedContent = searchParams.get('selectedContent')?.split(',') || []
-  const isConsultationOnly = category === 'consultation-only' || category === 'general-consultation' || selectedContent.includes('consultation-advice')
+  const isConsultationOnly = category === 'consultation-only' || category === 'general-consultation' || category === 'youtube-consultation' || selectedContent.includes('consultation-advice')
   const [selectedMethod, setSelectedMethod] = useState<ContactMethod | null>(
     null
   )
 
-  // 相談・アドバイスのみの場合は自動的にGoogle Meetに遷移
-  useEffect(() => {
-    if (isConsultationOnly) {
-      const params = new URLSearchParams(searchParams)
-      params.set('contactMethod', 'zoom')
-      router.push(`/book?${params.toString()}`)
-    }
-  }, [isConsultationOnly, searchParams, router])
+  // 相談・アドバイスのみの場合は、チャットを選択できないようにする（グレーアウト）
+  // 自動遷移は行わず、ユーザーに選択させる
 
   const handleNext = () => {
     if (!selectedMethod) return
@@ -48,17 +42,20 @@ function ContactPageContent() {
         <div className="grid md:grid-cols-2 gap-6">
           {/* チャット相談 */}
           <button
-            onClick={() => setSelectedMethod('chat')}
+            onClick={() => !isConsultationOnly && setSelectedMethod('chat')}
+            disabled={isConsultationOnly}
             className={`card text-left transition-all ${
-              selectedMethod === 'chat'
+              isConsultationOnly
+                ? 'opacity-50 cursor-not-allowed bg-gray-100'
+                : selectedMethod === 'chat'
                 ? 'ring-2 ring-primary bg-blue-50'
                 : 'hover:bg-gray-50'
             }`}
           >
             <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+              <div className={`w-12 h-12 ${isConsultationOnly ? 'bg-gray-200' : 'bg-green-100'} rounded-full flex items-center justify-center mr-4`}>
                 <svg
-                  className="w-6 h-6 text-green-600"
+                  className={`w-6 h-6 ${isConsultationOnly ? 'text-gray-400' : 'text-green-600'}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -71,16 +68,25 @@ function ContactPageContent() {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl font-bold">💬 チャットで相談する</h2>
+              <h2 className={`text-xl font-bold ${isConsultationOnly ? 'text-gray-400' : ''}`}>💬 チャットで相談する</h2>
             </div>
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>✅ 今すぐ聞きたい</p>
-              <p>✅ 文章でやり取りしたい</p>
-              <p>✅ 軽い相談・判断</p>
-            </div>
-            <div className="mt-4 text-xs text-gray-500">
-              → 次画面で「コピペして送る」案内を出します
-            </div>
+            {isConsultationOnly ? (
+              <div className="space-y-2 text-sm text-gray-500">
+                <p className="font-medium text-orange-600">※ 相談のみの場合はオンライン会議をご利用ください</p>
+                <p>相談内容を詳しくお伺いするため、オンライン会議での対応となります</p>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <p>✅ 今すぐ聞きたい</p>
+                  <p>✅ 文章でやり取りしたい</p>
+                  <p>✅ 軽い相談・判断</p>
+                </div>
+                <div className="mt-4 text-xs text-gray-500">
+                  → 次画面で「コピペして送る」案内を出します
+                </div>
+              </>
+            )}
           </button>
 
           {/* Google Meet相談 */}

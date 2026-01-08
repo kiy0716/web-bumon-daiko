@@ -20,7 +20,7 @@ function EstimatePageContent() {
   const selectedAdditionalDetails = searchParams.get('selectedAdditionalDetails')?.split(',') || []
 
   // 相談・アドバイスのみかどうか
-  const isConsultationOnly = category === 'consultation-only' || category === 'general-consultation' || selectedContent.includes('consultation-advice')
+  const isConsultationOnly = category === 'consultation-only' || category === 'general-consultation' || category === 'youtube-consultation' || selectedContent.includes('consultation-advice')
 
   // selectedDetailsとselectedAdditionalDetailsを統合して計算
   const allDetails = [...selectedDetails, ...selectedAdditionalDetails]

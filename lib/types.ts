@@ -2,6 +2,7 @@
 
 export type Category =
   | 'general-consultation'
+  | 'youtube-consultation'
   | 'website-lp'
   | 'banner-image'
   | 'video'

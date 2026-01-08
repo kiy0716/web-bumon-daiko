@@ -16,6 +16,7 @@ export function generateRequestId(): string {
 export function getCategoryDisplayName(category: string): string {
   const categoryMap: { [key: string]: string } = {
     'general-consultation': 'まずは色々相談したい',
+    'youtube-consultation': 'YouTubeの内容について詳しく知りたい',
     'website-lp': 'Webサイト・LP',
     'banner-image': 'バナー・画像',
     'video': '動画編集',
